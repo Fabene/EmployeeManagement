@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Employee List</title>
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<h1>Employee List</h1>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Birth Date</th>
+        <th>Sex</th>
+        <th>Phones</th>
+        <th>Address</th>
+        <th>Personal Email</th>
+        <th>Work Email</th>
+        <th>CIN Number</th>
+        <th>CIN Date of Issue</th>
+        <th>CIN Place of Issue</th>
+        <th>Job Title</th>
+        <th>Children Count</th>
+        <th>Hire Date</th>
+        <th>Departure Date</th>
+        <th>Socio-Professional Category</th>
+        <th>CNAPS Number</th>
+        <th>Photo</th>
+        <th>Actions</th>
+    </tr>
+    <tr th:each="employee : ${employees}">
+        <td th:text="${employee.id}"></td>
+        <td th:text="${employee.firstName}"></td>
+        <td th:text="${employee.lastName}"></td>
+        <td th:text="${employee.birthDate}"></td>
+        <td th:text="${employee.sex}"></td>
+        <td th:text="${employee.phones}"></td>
+        <td th:text="${employee.address}"></td>
+        <td th:text="${employee.personalEmail}"></td>
+        <td th:text="${employee.workEmail}"></td>
+        <td th:text="${employee.cinNumber}"></td>
+        <td th:text="${employee.cinDateOfIssue}"></td>
+        <td th:text="${employee.cinPlaceOfIssue}"></td>
+        <td th:text="${employee.jobTitle}"></td>
+        <td th:text="${employee.childrenCount}"></td>
+        <td th:text="${employee.hireDate}"></td>
+        <td th:text="${employee.departureDate}"></td>
+        <td th:text="${employee.socioProfessionalCategory}"></td>
+        <td th:text="${employee.cnapsNumber}"></td>
+        <td>
+            <!-- Afficher l'image si elle est disponible -->
+            <img th:if="${employee.imageData}" th:src="${employee.imageUrl}" style="max-width: 100px; max-height: 100px;" />
+            <!-- Afficher un message si aucune photo n'est disponible -->
+            <span th:unless="${employee.imageData}">No photo</span>
+        </td>
+        <td>
+            <!-- Lien "Update" qui redirige vers la page de mise à jour avec l'ID de l'employé -->
+            <a th:href="@{/updateEmployee/{id}(id=${employee.id})}">Update</a>
+        </td>
+    </tr>
+</table>
+
+<!-- Formulaire pour ajouter un nouvel employé -->
+<h2>Add New Employee</h2>
+<form action="/addEmployee" method="post" enctype="multipart/form-data">
+    <div style="display: flex; flex-wrap: wrap;">
+        <div style="flex: 1; margin-right: 10px;">
+            <label>First Name: <input type="text" name="firstName" required /></label><br>
+            <label>Last Name: <input type="text" name="lastName" required /></label><br>
+            <label>Birth Date: <input type="date" name="birthDate" required /></label><br>
+            <label>Sex: <input type="text" name="sex" required /></label><br>
+            <label>Phones: <input type="text" name="phones" required /></label><br>
+            <label>Address: <input type="text" name="address" required /></label><br>
+        </div>
+        <div style="flex: 1; margin-left: 10px;">
+            <label>Personal Email: <input type="email" name="personalEmail" required /></label><br>
+            <label>Work Email: <input type="email" name="workEmail" required /></label><br>
+            <label>CIN Number: <input type="text" name="cinNumber" required /></label><br>
+            <label>CIN Date of Issue: <input type="date" name="cinDateOfIssue" required /></label><br>
+            <label>CIN Place of Issue: <input type="text" name="cinPlaceOfIssue" required /></label><br>
+        </div>
+    </div>
+    <label>Job Title: <input type="text" name="jobTitle" required /></label><br>
+    <label>Children Count: <input type="number" name="childrenCount" required /></label><br>
+    <label>Hire Date: <input type="date" name="hireDate" required /></label><br>
+    <label>Departure Date (or "still working"): <input type="date" name="departureDate" required /></label><br>
+    <label>Socio-Professional Category: <input type="text" name="socioProfessionalCategory" required /></label><br>
+    <label>CNAPS Number: <input type="text" name="cnapsNumber" required /></label><br>
+    <!-- Champ pour télécharger la photo -->
+    <label>Photo: <input type="file" name="photo" accept="image/jpeg, image/png" /></label><br>
+    <input type="submit" value="Add Employee" />
+</form>
+</body>
+</html>

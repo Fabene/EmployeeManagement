@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Update Employee</title>
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<h1>Update Employee</h1>
+<form action="/saveUpdateEmployee/{id}" method="post" enctype="multipart/form-data" th:object="${employee}" th:action="@{/saveUpdateEmployee/{id}(id=${employee.id})}">
+    <label>First Name: <input type="text" name="firstName" th:value="${employee.firstName}" required /></label><br>
+    <label>Last Name: <input type="text" name="lastName" th:value="${employee.lastName}" required /></label><br>
+    <label>Birth Date: <input type="date" name="birthDate" th:value="${employee.birthDate}" required /></label><br>
+    <label>Sex: <input type="text" name="sex" th:value="${employee.sex}" required /></label><br>
+    <label>Phones: <input type="text" name="phones" th:value="${employee.phones}" required /></label><br>
+    <label>Address: <input type="text" name="address" th:value="${employee.address}" required /></label><br>
+    <label>Personal Email: <input type="email" name="personalEmail" th:value="${employee.personalEmail}" required /></label><br>
+    <label>Work Email: <input type="email" name="workEmail" th:value="${employee.workEmail}" required /></label><br>
+    <label>CIN Number: <input type="text" name="cinNumber" th:value="${employee.cinNumber}" required /></label><br>
+    <label>CIN Date of Issue: <input type="date" name="cinDateOfIssue" th:value="${employee.cinDateOfIssue}" required /></label><br>
+    <label>CIN Place of Issue: <input type="text" name="cinPlaceOfIssue" th:value="${employee.cinPlaceOfIssue}" required /></label><br>
+    <label>Job Title: <input type="text" name="jobTitle" th:value="${employee.jobTitle}" required /></label><br>
+    <label>Children Count: <input type="number" name="childrenCount" th:value="${employee.childrenCount}" required /></label><br>
+    <label>Hire Date: <input type="date" name="hireDate" th:value="${employee.hireDate}" required /></label><br>
+    <label>Departure Date (or "still working"): <input type="date" name="departureDate" th:value="${employee.departureDate}" required /></label><br>
+    <label>Socio-Professional Category: <input type="text" name="socioProfessionalCategory" th:value="${employee.socioProfessionalCategory}" required /></label><br>
+    <label>CNAPS Number: <input type="text" name="cnapsNumber" th:value="${employee.cnapsNumber}" required /></label><br>
+    <label>Photo: <input type="file" name="photo" accept="image/jpeg, image/png" /></label><br>
+    <input type="submit" value="Save Update" />
+</form>
+</body>
+</html>
