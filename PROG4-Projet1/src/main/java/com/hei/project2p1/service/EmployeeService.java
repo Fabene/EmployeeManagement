@@ -6,10 +6,12 @@ import com.hei.project2p1.repository.EmployeeRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.antlr.v4.runtime.misc.LogManager;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +20,7 @@ import java.util.Optional;
 @Service
 public class EmployeeService {
     private final EmployeeRepository employeeRepository;
+
 
     public List<Employee> getEmployeesFromSession(HttpSession session) {
         List<Employee> employees = (List<Employee>) session.getAttribute("employees");
@@ -64,4 +67,26 @@ public class EmployeeService {
        return employeeRepository.findById(EmployeeId);
 
     }
+    public List<Employee> filterEmployeesByAttributeAndValue(String attribute, String value) {
+        // Utilisez la méthode existante pour filtrer les employés en fonction de l'attribut et de la valeur
+        return employeeRepository.findAll((root, query, builder) -> {
+            // Construire la condition de recherche en fonction de l'attribut et de la valeur spécifiés
+            return builder.like(builder.lower(root.get(attribute)), "%" + value.toLowerCase() + "%");
+        });
+    }
+    public List<Employee> filterEmployeesByAttribute(String attribute, String value) {
+        // Implémentez ici la logique pour filtrer les employés en fonction de l'attribut et de la valeur
+        // Utilisez les critères de requête JPA pour créer la requête de filtrage
+        return employeeRepository.findAll((root, query, builder) -> {
+            // Construire la condition de recherche en fonction de l'attribut et de la valeur spécifiés
+            return builder.like(builder.lower(root.get(attribute)), "%" + value.toLowerCase() + "%");
+        });
+    }
+
+    public List<Employee> sortEmployeesByAttribute(String attribute) {
+        // Implémentez ici la logique pour trier les employés par attribut
+        // Utilisez les critères de requête JPA pour créer la requête de tri
+        return employeeRepository.findAll(Sort.by(attribute));
+    }
 }
+

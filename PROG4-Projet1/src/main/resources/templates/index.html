@@ -8,24 +8,24 @@
 <h1>Employee List</h1>
 <table>
     <tr>
-        <th>ID</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Birth Date</th>
-        <th>Sex</th>
-        <th>Phones</th>
-        <th>Address</th>
-        <th>Personal Email</th>
-        <th>Work Email</th>
-        <th>CIN Number</th>
-        <th>CIN Date of Issue</th>
-        <th>CIN Place of Issue</th>
-        <th>Job Title</th>
-        <th>Children Count</th>
-        <th>Hire Date</th>
-        <th>Departure Date</th>
-        <th>Socio-Professional Category</th>
-        <th>CNAPS Number</th>
+        <th><a th:href="@{/}">ID</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='lastName')}">First Name</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='lastName')}">Last Name</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='birthDate')}">Birth Date</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='sex')}">Sex</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='phones')}">Phones</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='address')}">Address</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='personalEmail')}">Personal Email</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='workEmail')}">Work Email</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='cinNumber')}">CIN Number</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='cinDateOfIssue')}">CIN Date of Issue</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='cinPlaceOfIssue')}">CIN Place of Issue</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='jobTitle')}">Job Title</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='childrenCount')}">Children Count</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='hireDate')}">Hire Date</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='departureDate')}">Departure Date</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='socioProfessionalCategory')}">Socio-Professional Category</a></th>
+        <th><a th:href="@{/sortEmployeesByAttribute(attribute='cnapsNumber')}">CNAPS Number</a></th>
         <th>Photo</th>
         <th>Actions</th>
     </tr>
@@ -60,7 +60,15 @@
         </td>
     </tr>
 </table>
-
+<div>
+    <form th:action="@{/filterEmployees}" method="get">
+        <label for="attribute">Attribute:</label>
+        <input type="text" id="attribute" name="attribute" required />
+        <label for="value">Value:</label>
+        <input type="text" id="value" name="value" required />
+        <button type="submit">Filter</button>
+    </form>
+</div>
 <!-- Formulaire pour ajouter un nouvel employé -->
 <h2>Add New Employee</h2>
 <form action="/addEmployee" method="post" enctype="multipart/form-data">
@@ -91,5 +99,6 @@
     <label>Photo: <input type="file" name="photo" accept="image/jpeg, image/png" /></label><br>
     <input type="submit" value="Add Employee" />
 </form>
+
 </body>
 </html>

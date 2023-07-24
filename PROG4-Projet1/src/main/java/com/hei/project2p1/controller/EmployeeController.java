@@ -18,6 +18,7 @@
     import java.io.IOException;
     import java.text.SimpleDateFormat;
     import java.util.Date;
+    import java.util.List;
     import java.util.Optional;
 
     @AllArgsConstructor
@@ -123,7 +124,33 @@
             // Rediriger vers la page principale (ou autre page de votre choix) après la mise à jour
             return "redirect:/";
         }
+        @GetMapping("/filterEmployees")
+        public String filterEmployeesByKeyword(@RequestParam("attribute") String attribute, @RequestParam("value") String value, Model model) {
+            // Appel à la méthode existante pour filtrer les employés par l'attribut et la valeur
+            List<Employee> filteredEmployees = employeeService.filterEmployeesByAttributeAndValue(attribute, value);
 
+            // Ajouter les employés filtrés au modèle pour les afficher dans la vue
+            model.addAttribute("employees", filteredEmployees);
+
+            // Ajouter un nouvel employé vide au modèle pour le formulaire
+            model.addAttribute("newEmployee", new Employee());
+
+            return "index";
+        }
+        @GetMapping("/filterEmployeesByAttribute")
+        public String filterEmployeesByAttribute(@RequestParam String attribute, @RequestParam String value, Model model) {
+            List<Employee> filteredEmployees = employeeService.filterEmployeesByAttribute(attribute, value);
+            model.addAttribute("employees", filteredEmployees);
+            model.addAttribute("newEmployee", new Employee());
+            return "index";
+        }
+        @GetMapping("/sortEmployeesByAttribute")
+        public String sortEmployeesByAttribute(@RequestParam String attribute, Model model) {
+            List<Employee> sortedEmployees = employeeService.sortEmployeesByAttribute(attribute);
+            model.addAttribute("employees", sortedEmployees);
+            model.addAttribute("newEmployee", new Employee());
+            return "index";
+        }
     }
 
 
