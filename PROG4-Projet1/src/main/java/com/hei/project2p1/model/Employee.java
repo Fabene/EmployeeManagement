@@ -53,13 +53,13 @@ public class Employee {
     @Column(name = "image_data")
     private byte[] imageData;
 
-    // ... Getters and Setters ...
+
 
     public String getImageUrl() {
         if (imageData != null && imageData.length > 0) {
             return "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(imageData);
         } else {
-            return ""; // URL d'une image par défaut si aucune photo n'est présente
+            return "";
         }
     }
     public void updateEmployee(Employee updatedEmployee) {
@@ -82,3 +82,6 @@ public class Employee {
         this.cnapsNumber = updatedEmployee.getCnapsNumber();
     }
 }
+
+
+

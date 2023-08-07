@@ -61,6 +61,11 @@
     </tr>
 </table>
 <div>
+    <form th:action="@{/exportAllToCSV}" method="get">
+        <button type="submit">Export All to CSV</button>
+    </form>
+</div>
+<div>
     <form th:action="@{/filterEmployees}" method="get">
         <label for="attribute">Attribute:</label>
         <input type="text" id="attribute" name="attribute" required />
@@ -69,6 +74,7 @@
         <button type="submit">Filter</button>
     </form>
 </div>
+
 <!-- Formulaire pour ajouter un nouvel employé -->
 <h2>Add New Employee</h2>
 <form action="/addEmployee" method="post" enctype="multipart/form-data">

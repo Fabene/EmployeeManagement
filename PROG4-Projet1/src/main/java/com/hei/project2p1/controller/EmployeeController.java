@@ -2,6 +2,7 @@
 
     import com.hei.project2p1.model.Employee;
     import com.hei.project2p1.service.EmployeeService;
+    import jakarta.servlet.http.HttpServletResponse;
     import lombok.AllArgsConstructor;
     import org.springframework.beans.propertyeditors.CustomDateEditor;
     import org.springframework.http.HttpHeaders;
@@ -16,10 +17,13 @@
 
 
     import java.io.IOException;
+    import java.io.PrintWriter;
     import java.text.SimpleDateFormat;
     import java.util.Date;
     import java.util.List;
     import java.util.Optional;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
 
     @AllArgsConstructor
     @Controller
@@ -28,32 +32,20 @@
 
         @GetMapping("/")
         public String index(Model model) {
-            // Récupère la liste des employés à partir du service
-            // et l'ajoute au modèle pour l'affichage dans la vue
             model.addAttribute("employees", employeeService.getEmployees());
-
-            // Ajoute un nouvel employé vide au modèle pour le formulaire
             model.addAttribute("newEmployee", new Employee());
             return "index";
         }
 
         @GetMapping("/UploadImage/{id}")
         public ResponseEntity<byte[]> getImage(@PathVariable Long id) throws IOException {
-            // Récupérer l'employé par son id en utilisant le service
             Optional<Employee> employeeOptional = employeeService.getEmployeeById(id);
-
-            // Vérifier si l'employé existe dans la base de données
             if (employeeOptional.isPresent()) {
                 Employee employee = employeeOptional.get();
-
-                // Récupérer les données binaires de la propriété 'photo' de l'employé
                 MultipartFile photo = employee.getPhoto();
                 byte[] photoData = photo.getBytes();
 
-
-                // Vérifier si l'employé a une photo
                 if (photoData != null && photoData.length > 0) {
-                    // Construire une réponse HTTP avec les données binaires en tant que corps de la réponse
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.IMAGE_JPEG);
                     headers.setContentLength(photoData.length);
@@ -61,7 +53,6 @@
                 }
             }
 
-            // Renvoyer une réponse vide si l'employé n'existe pas dans la base de données ou s'il n'a pas de photo
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         @InitBinder
@@ -72,17 +63,27 @@
         @PostMapping("/addEmployee")
         public String addEmployee(@ModelAttribute("newEmployee") Employee employee,
                                   @RequestParam("photo") MultipartFile photo,
-                                  @RequestParam("birthDate") Date birthDate) {
-            // Traiter l'image de l'employé et la stocker dans l'attribut 'photo' de l'employé
-            employeeService.processEmployeePhoto(employee, photo);
+                                  @RequestParam("birthDate") Date birthDate,
+                                  @RequestParam("phones") String phoneNumber,
+                                  Model model){
+            String regex = "^\\d{0,10}$";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(phoneNumber);
+            boolean phoneNumberExists = employeeService.isPhoneNumberExists(phoneNumber);
 
-            // Définir la date de naissance
-            employee.setBirthDate(String.valueOf(birthDate));
 
-            // Enregistrer l'employé dans la base de données
-            employeeService.save(employee);
-            return "redirect:/";
+            if (matcher.matches() && !phoneNumberExists) {
+                employeeService.processEmployeePhoto(employee, photo);
+                employee.setBirthDate(String.valueOf(birthDate));
+                employee.setPhones(phoneNumber);
+                employeeService.save(employee);
+                return "redirect:/";
+            } else {
+                model.addAttribute("errorMessage", "Numéro de téléphone invalide !");
+                return "/addEmployee";
+            }
         }
+
         @GetMapping("/updateEmployee/{id}")
         public String showUpdateForm(@PathVariable Long id, Model model) {
             Optional<Employee> employeeOptional = employeeService.getEmployeeById(id);
@@ -99,40 +100,31 @@
 
         @GetMapping("/updateEmployeeForm/{id}")
         public String showUpdateEmployeeForm(@PathVariable Long id, Model model) {
-            // Récupérer l'employé par son ID depuis la base de données
             Employee employee = employeeService.getEmployeeById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid employee ID: " + id));
 
-            // Ajouter l'employé au modèle pour afficher les valeurs dans le formulaire
             model.addAttribute("employee", employee);
 
-            // Charger la page "update_employee.html" pour afficher le formulaire
             return "update_employee";
         }
         @PostMapping("/saveUpdateEmployee/{id}")
         public String saveUpdate(@PathVariable Long id, @ModelAttribute Employee updatedEmployee) {
-            // Récupérer l'employé existant par son ID depuis la base de données
             Employee existingEmployee = employeeService.getEmployeeById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid employee ID: " + id));
 
-            // Mettre à jour les informations de l'employé existant avec les nouvelles informations
             existingEmployee.updateEmployee(updatedEmployee);
 
-            // Enregistrer les modifications dans la base de données
             employeeService.save(existingEmployee);
 
-            // Rediriger vers la page principale (ou autre page de votre choix) après la mise à jour
             return "redirect:/";
         }
         @GetMapping("/filterEmployees")
         public String filterEmployeesByKeyword(@RequestParam("attribute") String attribute, @RequestParam("value") String value, Model model) {
-            // Appel à la méthode existante pour filtrer les employés par l'attribut et la valeur
             List<Employee> filteredEmployees = employeeService.filterEmployeesByAttributeAndValue(attribute, value);
 
-            // Ajouter les employés filtrés au modèle pour les afficher dans la vue
             model.addAttribute("employees", filteredEmployees);
 
-            // Ajouter un nouvel employé vide au modèle pour le formulaire
+
             model.addAttribute("newEmployee", new Employee());
 
             return "index";
@@ -151,6 +143,43 @@
             model.addAttribute("newEmployee", new Employee());
             return "index";
         }
+        @GetMapping("/exportAllToCSV")
+        public void exportAllToCSV(HttpServletResponse response) throws IOException {
+            List<Employee> employees = employeeService.getEmployees();
+
+            response.setContentType("text/csv");
+            response.setHeader("Content-Disposition", "attachment; filename=\"employees.csv\"");
+
+            PrintWriter writer = response.getWriter();
+            writer.println("ID,First Name,Last Name,Birth Date,Sex,Phones,Address,Personal Email,Work Email,CIN Number,CIN Date of Issue,CIN Place of Issue,Job Title,Children Count,Hire Date,Departure Date,Socio-Professional Category,CNAPS Number");
+
+            for (Employee employee : employees) {
+                writer.println(formatCSVLine(employee));
+            }
+        }
+        private String formatCSVLine(Employee employee) {
+            return String.format("%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%s,%s,%s,%s",
+                    employee.getId(),
+                    employee.getFirstName(),
+                    employee.getLastName(),
+                    employee.getBirthDate(),
+                    employee.getSex(),
+                    employee.getPhones(),
+                    employee.getAddress(),
+                    employee.getPersonalEmail(),
+                    employee.getWorkEmail(),
+                    employee.getCinNumber(),
+                    employee.getCinDateOfIssue(),
+                    employee.getCinPlaceOfIssue(),
+                    employee.getJobTitle(),
+                    employee.getChildrenCount(),
+                    employee.getHireDate(),
+                    employee.getDepartureDate(),
+                    employee.getSocioProfessionalCategory(),
+                    employee.getCnapsNumber()
+            );
+        }
+
     }
 
 
